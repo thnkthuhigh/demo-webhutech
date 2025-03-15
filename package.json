@@ -15,8 +15,11 @@
     "@mui/icons-material": "^6.4.4",
     "@mui/material": "^6.4.4",
     "demo-web_dat_ve_phim": "file:",
+    "prop-types": "^15.8.1",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-slick": "^0.30.3",
+    "slick-carousel": "^1.8.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.19.0",

@@ -1,14 +1,14 @@
-import {useState} from "react";
-import Button from "@mui/material/Button";
-
+import AppBar from "./components/AppBar/index";
+import {Box} from "@mui/material";
+import theme from "./theme";
+import Body from "./components/Body/index";
 function App() {
-  const [count, setCount] = useState(0);
-
   return (
-    <>
+    <Box>
       {" "}
-      <Button variant='contained'>Hello world</Button>
-    </>
+      <AppBar theme={theme} />
+      <Body />
+    </Box>
   );
 }
 
