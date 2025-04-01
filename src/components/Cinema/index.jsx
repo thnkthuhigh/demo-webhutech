@@ -1,7 +1,21 @@
 import {useState} from "react";
-import {Card, CardContent} from "@/components/ui/card";
-import {Button} from "@/components/ui/button";
-import {Select, SelectItem} from "@/components/ui/select";
+import dayjs from "dayjs";
+import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
+import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
+import {DatePicker} from "@mui/x-date-pickers/DatePicker";
+
+import {
+  Container,
+  Typography,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Card,
+  CardContent,
+  Button,
+  Grid,
+} from "@mui/material";
 
 const cinemas = [
   {id: 1, name: "CGV Hùng Vương Plaza"},
@@ -27,37 +41,53 @@ const movies = {
 
 export default function MovieSchedule() {
   const [selectedCinema, setSelectedCinema] = useState(cinemas[0].id);
-  const [showUpcoming, setShowUpcoming] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(dayjs());
 
   return (
-    <div className='p-6'>
-      <h1 className='text-2xl font-bold mb-4'>Lịch Chiếu Phim</h1>
-      <Select
-        value={selectedCinema}
-        onChange={(e) => setSelectedCinema(Number(e.target.value))}>
-        {cinemas.map((cinema) => (
-          <SelectItem key={cinema.id} value={cinema.id}>
-            {cinema.name}
-          </SelectItem>
-        ))}
-      </Select>
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
+      <Container sx={{mt: 4}}>
+        <Typography variant='h4' gutterBottom>
+          Lịch Chiếu Phim
+        </Typography>
 
-      <div className='grid gap-4 mt-4'>
-        {movies[selectedCinema].map((movie) => (
-          <Card key={movie.id}>
-            <CardContent>
-              <h2 className='text-xl font-semibold'>{movie.title}</h2>
-              <p className='text-gray-600'>
-                Suất chiếu: {movie.showtimes.join(", ")}
-              </p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+        <FormControl fullWidth sx={{mb: 3}}>
+          <InputLabel>Chọn Rạp</InputLabel>
+          <Select
+            value={selectedCinema}
+            onChange={(e) => setSelectedCinema(e.target.value)}>
+            {cinemas.map((cinema) => (
+              <MenuItem key={cinema.id} value={cinema.id}>
+                {cinema.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
-      <Button className='mt-6' onClick={() => setShowUpcoming(!showUpcoming)}>
-        {showUpcoming ? "Xem Phim Đang Chiếu" : "Xem Phim Sắp Chiếu"}
-      </Button>
-    </div>
+        <DatePicker
+          label='Chọn Ngày'
+          value={selectedDate}
+          onChange={(newDate) => setSelectedDate(newDate)}
+          sx={{mb: 3, width: "100%"}}
+        />
+
+        <Grid container spacing={2}>
+          {movies[selectedCinema]?.map((movie) => (
+            <Grid item xs={12} md={6} key={movie.id}>
+              <Card>
+                <CardContent>
+                  <Typography variant='h6'>{movie.title}</Typography>
+                  <Typography color='text.secondary'>
+                    Suất chiếu: {movie.showtimes.join(", ")}
+                  </Typography>
+                  <Button variant='contained' sx={{mt: 1}}>
+                    Mua Vé
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      </Container>
+    </LocalizationProvider>
   );
 }

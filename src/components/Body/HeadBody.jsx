@@ -62,7 +62,7 @@ const HeadBody = () => {
         variant='h6'
         sx={{
           textAlign: "center",
-          bgcolor: "#8D6E63",
+          bgcolor: "#000000",
           color: "white",
           py: 1,
         }}>

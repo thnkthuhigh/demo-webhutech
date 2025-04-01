@@ -9,13 +9,13 @@ import {
 
 const BannerAd = () => {
   return (
-    <Box sx={{bgcolor: "#FFA07A", p: 4, textAlign: "left", marginX: "10rem"}}>
+    <Box sx={{bgcolor: "#f48fb1	", p: 4, textAlign: "left", marginX: "10rem"}}>
       <Typography variant='h5' fontWeight='bold'>
         Mua vé xem phim Online trên FOUREEL
       </Typography>
       <Typography variant='body1' sx={{mt: 2}}>
-        Mua vé xem phim dễ dàng cùng... Với nhiều ưu đãi hấp dẫn và kết nối với
-        tất cả các rạp lớn trên khắp Việt Nam. Đặt vé ngay!
+        Mua vé xem phim dễ dàng cùng FOUREEL Với nhiều ưu đãi hấp dẫn trên khắp
+        Việt Nam. Đặt vé ngay!
       </Typography>
       <RadioGroup sx={{mt: 2}}>
         <FormControlLabel

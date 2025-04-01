@@ -1,148 +1,84 @@
-import {
-  AppBar,
-  Toolbar,
-  Button,
-  Box,
-  TextField,
-  IconButton,
-} from "@mui/material";
+import {AppBar, Toolbar, Button, Box, Divider} from "@mui/material";
 import CinematIcon from "../../assets/img/CinematIcon";
-import SearchIcon from "@mui/icons-material/Search";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import {Link} from "react-router-dom";
-import {useState} from "react";
 
 const Navbar = () => {
-  const [open, setOpen] = useState(false); // Kiểm soát menu dropdown
-
   return (
-    <AppBar position='static' sx={{bgcolor: "#F48FB1", height: 64}}>
+    <AppBar position='static' sx={{bgcolor: "#ffffff "}}>
+      {/* Phần 1: Thông tin ưu đãi, vé của tôi, đăng nhập */}
       <Toolbar
         sx={{
           display: "flex",
-          justifyContent: "space-between",
-          height: "100%",
-          padding: "2px",
+          justifyContent: "right",
+          minHeight: "20px !important", // Ghi đè chiều cao mặc định
+          height: "30px", // Đặt chiều cao cụ thể
+          padding: "6px 16px", // Giảm padding để không làm tăng chiều cao
+          bgcolor: "#000000 ",
         }}>
-        {/* Logo */}
-        <Box
-          sx={{display: "flex", alignItems: "center", height: "100%"}}
-          component={Link}
-          to='/'>
-          <CinematIcon />
-        </Box>
-        <Box sx={{display: "flex"}}>
+        <Box sx={{display: "flex", gap: 1, mx: "120px"}}>
           <Button
-            variant='contained'
             component={Link}
-            to='/lich-chieu'
-            sx={{bgcolor: "#FF6F00", color: "white", marginRight: "3rem"}}>
-            Mua Vé
+            to='/tin-moi'
+            sx={{color: "white", fontSize: "12px", padding: "4px 8px"}}>
+            TIN MỚI & ƯU ĐÃI
           </Button>
-          <Box sx={{display: "flex", gap: 2.5, marginRight: "20rem"}}>
-            {/* Dropdown Menu khi hover vào "Phim" */}
-            <Box
-              sx={{
-                position: "relative",
-                display: "inline-block",
-              }}
-              onMouseEnter={() => setOpen(true)}
-              onMouseLeave={() => setOpen(false)}>
-              {/* Nút Phim */}
-              <Button
-                color='inherit'
-                component={Link}
-                to='/lich-chieu'
-                onMouseEnter={() => setOpen(true)}>
-                Phim
-              </Button>
+          <Button
+            component={Link}
+            to='/ve-cua-toi'
+            sx={{color: "white", fontSize: "12px", padding: "4px 8px"}}>
+            VÉ CỦA TÔI
+          </Button>
+        </Box>
+        <Button
+          component={Link}
+          to='/dang-nhap'
+          startIcon={<AccountCircleIcon />}
+          sx={{fontSize: "12px", padding: "4px 8px"}}>
+          ĐĂNG NHẬP / ĐĂNG KÝ
+        </Button>
+      </Toolbar>
 
-              {/* Vùng đệm trong suốt để giữ hover */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  top: "100%", // Nằm ngay dưới nút
-                  left: 0,
-                  width: "100%",
-                  height: "20px", // Chiều cao khoảng đệm (tăng lên nếu cần)
-                  backgroundColor: "transparent",
-                }}
-              />
+      <Divider sx={{bgcolor: "#D32F2F", height: 2}} />
 
-              {/* Dropdown */}
-              {open && (
-                <Box
-                  sx={{
-                    position: "absolute",
-                    top: "150%", // Đẩy dropdown xuống sâu hơn
-                    left: 0,
-                    bgcolor: "#F48FB1",
-                    boxShadow: 3,
-                    borderRadius: 1,
-                    zIndex: 10,
-                    padding: "0.5rem",
-                    border: "solid 2px black",
-                    minWidth: "max-content",
-                  }}>
-                  <Button
-                    component={Link}
-                    to='/phim-dang-chieu'
-                    sx={{
-                      display: "block",
-                      textAlign: "left",
-                      width: "100%",
-                      color: "black",
-                    }}>
-                    Phim Đang Chiếu
-                  </Button>
-                  <Button
-                    component={Link}
-                    to='/phim-sap-chieu'
-                    sx={{
-                      display: "block",
-                      textAlign: "left",
-                      width: "100%",
-                      color: "black",
-                    }}>
-                    Phim Sắp Chiếu
-                  </Button>
-                </Box>
-              )}
-            </Box>
-
-            <Button color='inherit' component={Link} to='/rap-chieu'>
-              Rạp Chiếu
+      {/* Phần 2 & 3: Logo + Nav + Đặt vé */}
+      <Toolbar
+        sx={{
+          maxHeight: "100px",
+          display: "flex",
+          alignItems: "center",
+          padding: "8px 16px",
+          justifyContent: "center",
+        }}>
+        {/* Logo và Nav nằm ngang và căn giữa */}
+        <Box sx={{display: "flex", alignItems: "center", gap: 5}}>
+          <Box component={Link} to='/' sx={{height: "64px", display: "flex"}}>
+            <CinematIcon />
+          </Box>
+          <Box sx={{display: "flex", gap: 3}}>
+            <Button component={Link} to='/phim' sx={{color: "black"}}>
+              PHIM
             </Button>
-            <Button color='inherit' component={Link} to='/members'>
-              Members
+            <Button component={Link} to='/rap' sx={{color: "black"}}>
+              RẠP FOUREEL
+            </Button>
+            <Button component={Link} to='/thanh-vien' sx={{color: "black"}}>
+              THÀNH VIÊN
+            </Button>
+            <Button component={Link} to='/cultureplex' sx={{color: "black"}}>
+              CULTUREPLEX
             </Button>
           </Box>
         </Box>
 
-        <Box sx={{display: "flex"}}>
-          <Box sx={{display: "flex", alignItems: "center", gap: 1}}>
-            <TextField
-              size='small'
-              variant='outlined'
-              placeholder='Tìm kiếm...'
-              sx={{
-                bgcolor: "white",
-                borderRadius: 1,
-                "& .MuiOutlinedInput-root": {
-                  height: 35,
-                },
-              }}
-            />
-            <IconButton sx={{marginRight: "3rem"}}>
-              <SearchIcon sx={{color: "white"}} />
-            </IconButton>
-          </Box>
+        {/* Nút đặt vé ngay dính bên phải */}
+        <Box sx={{position: "absolute", right: "150px"}}>
           <Button
-            color='inherit'
-            startIcon={<AccountCircleIcon />}
             component={Link}
-            to='/dang-nhap'>
-            Đăng Nhập
+            to='/lichchieu'
+            variant='contained'
+            sx={{bgcolor: "red", color: "white"}}>
+            MUA VÉ NGAY
           </Button>
         </Box>
       </Toolbar>
