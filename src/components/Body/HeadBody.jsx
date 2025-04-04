@@ -1,17 +1,17 @@
 import Slider from "react-slick";
-import {Box, Typography, IconButton} from "@mui/material";
-import {ArrowBackIos, ArrowForwardIos} from "@mui/icons-material";
+import { Box, Typography, IconButton } from "@mui/material";
+import { ArrowBackIos, ArrowForwardIos } from "@mui/icons-material";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import PropTypes from "prop-types";
 
 const movies = [
-  {id: 1, title: "Lạc Trôi", img: "/src/assets/img/1.jpg"},
-  {id: 2, title: "Cô Tiên", img: "/src/assets/img/2.jpg"},
-  {id: 3, title: "Dune 2", img: "/src/assets/img/3.jpg"},
+  { id: 1, title: "Lạc Trôi", img: "/src/assets/img/1.jpg" },
+  { id: 2, title: "Cô Tiên", img: "/src/assets/img/2.jpg" },
+  { id: 3, title: "Dune 2", img: "/src/assets/img/3.jpg" },
 ];
 
-const NextArrow = ({onClick}) => (
+const NextArrow = ({ onClick }) => (
   <IconButton
     onClick={onClick}
     sx={{
@@ -21,13 +21,14 @@ const NextArrow = ({onClick}) => (
       zIndex: 1,
       color: "white",
       bgcolor: "rgba(0,0,0,0.5)",
-      "&:hover": {bgcolor: "rgba(0,0,0,0.8)"},
-    }}>
+      "&:hover": { bgcolor: "rgba(0,0,0,0.8)" },
+    }}
+  >
     <ArrowForwardIos />
   </IconButton>
 );
 
-const PrevArrow = ({onClick}) => (
+const PrevArrow = ({ onClick }) => (
   <IconButton
     onClick={onClick}
     sx={{
@@ -37,8 +38,9 @@ const PrevArrow = ({onClick}) => (
       zIndex: 1,
       color: "white",
       bgcolor: "rgba(0,0,0,0.5)",
-      "&:hover": {bgcolor: "rgba(0,0,0,0.8)"},
-    }}>
+      "&:hover": { bgcolor: "rgba(0,0,0,0.8)" },
+    }}
+  >
     <ArrowBackIos />
   </IconButton>
 );
@@ -57,24 +59,25 @@ const HeadBody = () => {
   };
 
   return (
-    <Box sx={{width: "100%", position: "relative"}}>
+    <Box sx={{ width: "100%", position: "relative" }}>
       <Typography
-        variant='h6'
+        variant="h6"
         sx={{
           textAlign: "center",
           bgcolor: "#000000",
           color: "white",
           py: 1,
-        }}>
+        }}
+      >
         PHIM HOT TẠI RẠP
       </Typography>
       <Slider {...settings}>
         {movies.map((movie) => (
-          <Box key={movie.id} sx={{position: "relative"}}>
+          <Box key={movie.id} sx={{ position: "relative" }}>
             <img
               src={movie.img}
               alt={movie.title}
-              style={{width: "100%", height: "450px", objectFit: "cover"}}
+              style={{ width: "100%", height: "450px", objectFit: "cover" }}
             />
           </Box>
         ))}

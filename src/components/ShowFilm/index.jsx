@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useEffect, useState } from "react";
 import {
   Container,
   Grid,
@@ -11,125 +11,132 @@ import {
   Tabs,
   Tab,
 } from "@mui/material";
-
-const moviesNowShowing = [
-  {
-    title: "QUỶ NHẬP TRÀNG",
-    genre: "Kinh Dị",
-    duration: "121 phút 51 giây",
-    releaseDate: "07-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-  {
-    title: "NÀNG BẠCH TUYẾT",
-    genre: "Gia Đình, Phiêu Lưu",
-    duration: "108 phút",
-    releaseDate: "21-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-  {
-    title: "CÔ GÁI NĂM ẤY CHÚNG TA CÙNG THEO ĐUỔI",
-    genre: "Hài, Tâm Lý, Tình Cảm",
-    duration: "202 phút",
-    releaseDate: "21-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-  {
-    title: "QUỶ NHẬP TRÀNG",
-    genre: "Kinh Dị",
-    duration: "121 phút 51 giây",
-    releaseDate: "07-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-  {
-    title: "NÀNG BẠCH TUYẾT",
-    genre: "Gia Đình, Phiêu Lưu",
-    duration: "108 phút",
-    releaseDate: "21-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-  {
-    title: "CÔ GÁI NĂM ẤY CHÚNG TA CÙNG THEO ĐUỔI",
-    genre: "Hài, Tâm Lý, Tình Cảm",
-    duration: "202 phút",
-    releaseDate: "21-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-];
-
-const moviesComingSoon = [
-  {
-    title: "NGHỀ SIÊU KHÓ NÓI",
-    genre: "Hài, Tình Cảm",
-    duration: "120 phút",
-    releaseDate: "21-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-  {
-    title: "NGHI LỄ TRỤC QUỶ",
-    genre: "Kinh Dị",
-    duration: "96 phút",
-    releaseDate: "19-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-  {
-    title: "ANH KHÔNG ĐAU",
-    genre: "Hài, Hành Động, Hỗn Hợp",
-    duration: "110 phút",
-    releaseDate: "14-03-2025",
-    img: "https://via.placeholder.com/150",
-  },
-];
+import { db } from "../../db.config";
+import { collection, getDocs } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore";
 
 export default function MovieList() {
   const [tabIndex, setTabIndex] = useState(0);
+  const [moviesNowShowing, setMoviesNowShowing] = useState([]);
+  const [moviesComingSoon, setMoviesComingSoon] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchMovies = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(db, "movie"));
+        const now = new Date();
+        const nowShowing = [];
+        const comingSoon = [];
+
+        querySnapshot.forEach((doc) => {
+          const movie = doc.data();
+
+          let releaseDate = movie.releaseDate;
+
+          // Kiểm tra nếu releaseDate là Timestamp
+          if (releaseDate instanceof Timestamp) {
+            releaseDate = releaseDate.toDate(); // Chuyển đổi Timestamp thành Date object
+          } else if (typeof releaseDate === "string") {
+            releaseDate = new Date(releaseDate); // Nếu là chuỗi, chuyển thành Date
+          }
+
+          // Kiểm tra trường hợp nếu releaseDate không hợp lệ
+          if (!(releaseDate instanceof Date) || isNaN(releaseDate)) {
+            releaseDate = new Date(0); // Nếu không hợp lệ, mặc định là 01/01/1970
+          }
+
+          const movieWithId = { id: doc.id, ...movie, releaseDate };
+
+          // Phân loại phim dựa trên releaseDate
+          if (releaseDate <= now) {
+            nowShowing.push(movieWithId);
+          } else {
+            comingSoon.push(movieWithId);
+          }
+        });
+
+        setMoviesNowShowing(nowShowing);
+        setMoviesComingSoon(comingSoon);
+      } catch (err) {
+        setError("Có lỗi xảy ra khi tải dữ liệu phim.");
+        console.error("Error fetching movies:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchMovies();
+  }, []);
+
+  const formatDate = (date) => {
+    const day = date.getDate().toString().padStart(2, "0");
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   const movies = tabIndex === 0 ? moviesNowShowing : moviesComingSoon;
 
   return (
-    <Container sx={{marginY: "5rem"}}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          mb: 2,
-          marginY: "3rem",
-        }}>
+    <Container sx={{ marginY: "5rem" }}>
+      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
         <Tabs
           value={tabIndex}
-          onChange={(e, newValue) => setTabIndex(newValue)}>
-          <Tab label='Phim Đang Chiếu' />
-          <Tab label='Phim Sắp Chiếu' />
+          onChange={(e, newValue) => setTabIndex(newValue)}
+        >
+          <Tab label="Phim Đang Chiếu" />
+          <Tab label="Phim Sắp Chiếu" />
         </Tabs>
       </Box>
-      <Grid container spacing={3}>
-        {movies.map((movie, index) => (
-          <Grid item xs={12} sm={6} md={4} key={index}>
-            <Card>
-              <CardMedia
-                component='img'
-                height='200'
-                image={movie.img}
-                alt={movie.title}
-              />
-              <CardContent>
-                <Typography variant='h6'>{movie.title}</Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  Thể loại: {movie.genre}
-                </Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  Thời lượng: {movie.duration}
-                </Typography>
-                <Typography variant='body2' color='text.secondary'>
-                  Khởi chiếu: {movie.releaseDate}
-                </Typography>
-                <Button variant='contained' color='primary' sx={{mt: 1}}>
-                  Mua Vé
-                </Button>
-              </CardContent>
-            </Card>
-          </Grid>
-        ))}
-      </Grid>
+
+      {loading ? (
+        <Typography variant="h6" align="center">
+          Đang tải dữ liệu...
+        </Typography>
+      ) : error ? (
+        <Typography variant="h6" color="error" align="center">
+          {error}
+        </Typography>
+      ) : movies.length === 0 ? (
+        <Typography variant="h6" align="center">
+          Không có phim nào để hiển thị.
+        </Typography>
+      ) : (
+        <Grid container spacing={3}>
+          {movies.map((movie, index) => (
+            <Grid item xs={12} sm={6} md={4} key={movie.id || index}>
+              <Card>
+                <CardMedia
+                  component="img"
+                  height="200"
+                  image={movie.img || "https://via.placeholder.com/150"}
+                  alt={movie.title}
+                />
+                <CardContent>
+                  <Typography variant="h6">{movie.title}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Thể loại: {movie.category}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Thời lượng: {movie.duration}
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Khởi chiếu:{" "}
+                    {movie.releaseDate instanceof Date
+                      ? formatDate(movie.releaseDate)
+                      : "N/A"}
+                  </Typography>
+                  <Button variant="contained" sx={{ mt: 1 }}>
+                    Mua Vé
+                  </Button>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
     </Container>
   );
 }
