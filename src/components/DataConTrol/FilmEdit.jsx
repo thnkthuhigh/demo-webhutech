@@ -12,6 +12,7 @@ const FilmEdit = () => {
   const [category, setCategory] = useState("");
   const [duration, setDuration] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
+  const [imageUrl, setImageUrl] = useState(""); // Thêm trường URL ảnh
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -30,6 +31,7 @@ const FilmEdit = () => {
           } else {
             setReleaseDate("");
           }
+          setImageUrl(movie.img || ""); // Lấy ảnh hiện tại nếu có
         } else {
           console.error("Không tìm thấy phim!");
         }
@@ -55,6 +57,7 @@ const FilmEdit = () => {
         category,
         duration,
         releaseDate: timestamp,
+        img: imageUrl, // Cập nhật ảnh nếu có thay đổi
       });
       navigate("/phimx");
     } catch (error) {
@@ -96,6 +99,14 @@ const FilmEdit = () => {
         InputLabelProps={{ shrink: true }}
         value={releaseDate}
         onChange={(e) => setReleaseDate(e.target.value)}
+      />
+      <TextField
+        label="URL ảnh"
+        fullWidth
+        margin="normal"
+        value={imageUrl}
+        onChange={(e) => setImageUrl(e.target.value)}
+        placeholder="Nhập URL ảnh (nếu thay đổi)"
       />
       <Button variant="contained" onClick={handleUpdate}>
         Lưu thay đổi

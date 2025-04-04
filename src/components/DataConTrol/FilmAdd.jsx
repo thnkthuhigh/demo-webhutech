@@ -3,18 +3,17 @@ import { db } from "../../db.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { TextField, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const FilmAdd = () => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [duration, setDuration] = useState("");
   const [releaseDate, setReleaseDate] = useState(""); // yyyy-mm-dd
-  const [imageFile, setImageFile] = useState(null); // State để lưu ảnh
+  const [imageUrl, setImageUrl] = useState(""); // State để lưu URL ảnh
   const navigate = useNavigate();
 
   const handleAdd = async () => {
-    if (!title || !category || !duration || !releaseDate || !imageFile) {
+    if (!title || !category || !duration || !releaseDate || !imageUrl) {
       alert("Vui lòng điền đầy đủ thông tin.");
       return;
     }
@@ -22,14 +21,6 @@ const FilmAdd = () => {
     try {
       // Chuyển releaseDate từ chuỗi sang Date object
       const dateObject = new Date(releaseDate);
-
-      // Tải ảnh lên Firebase Storage
-      const storage = getStorage();
-      const storageRef = ref(storage, `movies/${imageFile.name}`);
-      await uploadBytes(storageRef, imageFile);
-
-      // Lấy URL của ảnh
-      const imageUrl = await getDownloadURL(storageRef);
 
       // Lưu thông tin phim vào Firestore
       await addDoc(collection(db, "movie"), {
@@ -83,11 +74,14 @@ const FilmAdd = () => {
         value={releaseDate}
         onChange={(e) => setReleaseDate(e.target.value)}
       />
-      <input
-        type="file"
-        accept="image/*"
-        onChange={(e) => setImageFile(e.target.files[0])}
-        style={{ margin: "20px 0" }}
+
+      <TextField
+        label="URL ảnh"
+        fullWidth
+        margin="normal"
+        value={imageUrl}
+        onChange={(e) => setImageUrl(e.target.value)}
+        placeholder="Nhập URL ảnh"
       />
 
       <Button variant="contained" onClick={handleAdd}>
