@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db } from "../../db.config";
+import { db } from "../../../db.config";
 import { doc, getDoc, updateDoc } from "firebase/firestore";
 import { useParams, useNavigate } from "react-router-dom";
 import { TextField, Button, Typography } from "@mui/material";
@@ -12,7 +12,8 @@ const FilmEdit = () => {
   const [category, setCategory] = useState("");
   const [duration, setDuration] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
-  const [imageUrl, setImageUrl] = useState(""); // Thêm trường URL ảnh
+  const [imageUrl, setImageUrl] = useState("");
+  const [description, setDescription] = useState(""); // Thêm state cho mô tả
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -24,6 +25,9 @@ const FilmEdit = () => {
           setTitle(movie.title || "");
           setCategory(movie.category || "");
           setDuration(movie.duration || "");
+          setImageUrl(movie.img || "");
+          setDescription(movie.description || ""); // Lấy mô tả nếu có
+
           if (movie.releaseDate?.toDate) {
             const dateObj = movie.releaseDate.toDate();
             const formatted = dateObj.toISOString().slice(0, 10); // yyyy-mm-dd
@@ -31,7 +35,6 @@ const FilmEdit = () => {
           } else {
             setReleaseDate("");
           }
-          setImageUrl(movie.img || ""); // Lấy ảnh hiện tại nếu có
         } else {
           console.error("Không tìm thấy phim!");
         }
@@ -47,7 +50,6 @@ const FilmEdit = () => {
     try {
       const docRef = doc(db, "movie", id);
 
-      // Chuyển chuỗi "yyyy-mm-dd" sang Timestamp
       const [year, month, day] = releaseDate.split("-");
       const dateObj = new Date(year, month - 1, day);
       const timestamp = Timestamp.fromDate(dateObj);
@@ -57,8 +59,10 @@ const FilmEdit = () => {
         category,
         duration,
         releaseDate: timestamp,
-        img: imageUrl, // Cập nhật ảnh nếu có thay đổi
+        img: imageUrl,
+        description, // Cập nhật mô tả
       });
+
       navigate("/phimx");
     } catch (error) {
       console.error("Lỗi khi cập nhật phim:", error);
@@ -70,6 +74,7 @@ const FilmEdit = () => {
       <Typography variant="h5" gutterBottom>
         Chỉnh sửa phim
       </Typography>
+
       <TextField
         label="Tên phim"
         fullWidth
@@ -108,6 +113,17 @@ const FilmEdit = () => {
         onChange={(e) => setImageUrl(e.target.value)}
         placeholder="Nhập URL ảnh (nếu thay đổi)"
       />
+      <TextField
+        label="Mô tả nội dung phim"
+        fullWidth
+        margin="normal"
+        multiline
+        rows={4}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Nhập nội dung mô tả"
+      />
+
       <Button variant="contained" onClick={handleUpdate}>
         Lưu thay đổi
       </Button>

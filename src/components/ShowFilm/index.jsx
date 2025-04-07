@@ -107,14 +107,28 @@ export default function MovieList() {
         <Grid container spacing={3}>
           {movies.map((movie, index) => (
             <Grid item xs={12} sm={6} md={4} key={movie.id || index}>
-              <Card>
+              <Card
+                sx={{
+                  display: "flex",
+                  flexDirection: "column",
+                  height: "100%",
+                }}
+              >
                 <CardMedia
                   component="img"
                   height="200"
                   image={movie.img || "https://via.placeholder.com/150"}
                   alt={movie.title}
+                  sx={{
+                    padding: "8px", // Thêm padding xung quanh ảnh
+                    height: "auto",
+                    width: "100%",
+                    objectFit: "cover",
+                    objectPosition: "center",
+                    borderRadius: "8px", // Để ảnh có góc bo tròn nếu cần
+                  }}
                 />
-                <CardContent>
+                <CardContent sx={{ flexGrow: 1, paddingTop: 2 }}>
                   <Typography variant="h6">{movie.title}</Typography>
                   <Typography variant="body2" color="text.secondary">
                     Thể loại: {movie.category}
@@ -128,10 +142,13 @@ export default function MovieList() {
                       ? formatDate(movie.releaseDate)
                       : "N/A"}
                   </Typography>
-                  <Button variant="contained" sx={{ mt: 1 }}>
+                </CardContent>
+                {/* Nút mua vé nằm ở dưới cùng, căn chỉnh flex */}
+                <Box sx={{ marginTop: "auto", padding: "16px" }}>
+                  <Button variant="contained" sx={{ width: "100%" }}>
                     Mua Vé
                   </Button>
-                </CardContent>
+                </Box>
               </Card>
             </Grid>
           ))}

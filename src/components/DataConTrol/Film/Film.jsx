@@ -1,6 +1,6 @@
 // src/components/ShowFilm/index.jsx
 import { useEffect, useState } from "react";
-import { db } from "../../db.config";
+import { db } from "../../../db.config";
 import { collection, getDocs } from "firebase/firestore";
 import { Typography, Box } from "@mui/material";
 

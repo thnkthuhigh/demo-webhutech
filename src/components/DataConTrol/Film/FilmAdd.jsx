@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { db } from "../../db.config";
+import { db } from "../../../db.config";
 import { collection, addDoc, Timestamp } from "firebase/firestore";
 import { TextField, Button, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -9,29 +9,35 @@ const FilmAdd = () => {
   const [category, setCategory] = useState("");
   const [duration, setDuration] = useState("");
   const [releaseDate, setReleaseDate] = useState(""); // yyyy-mm-dd
-  const [imageUrl, setImageUrl] = useState(""); // State để lưu URL ảnh
+  const [imageUrl, setImageUrl] = useState(""); // URL ảnh
+  const [description, setDescription] = useState(""); // Mô tả nội dung phim
   const navigate = useNavigate();
 
   const handleAdd = async () => {
-    if (!title || !category || !duration || !releaseDate || !imageUrl) {
+    if (
+      !title ||
+      !category ||
+      !duration ||
+      !releaseDate ||
+      !imageUrl ||
+      !description
+    ) {
       alert("Vui lòng điền đầy đủ thông tin.");
       return;
     }
 
     try {
-      // Chuyển releaseDate từ chuỗi sang Date object
       const dateObject = new Date(releaseDate);
 
-      // Lưu thông tin phim vào Firestore
       await addDoc(collection(db, "movie"), {
         title,
         category,
         duration,
-        releaseDate: Timestamp.fromDate(dateObject), // lưu kiểu timestamp
-        img: imageUrl, // Lưu URL ảnh
+        releaseDate: Timestamp.fromDate(dateObject),
+        img: imageUrl,
+        description,
       });
 
-      // Điều hướng tới trang danh sách phim
       navigate("/phimx");
     } catch (error) {
       console.error("Lỗi khi thêm phim:", error);
@@ -51,6 +57,7 @@ const FilmAdd = () => {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
       />
+
       <TextField
         label="Thể loại"
         fullWidth
@@ -58,6 +65,7 @@ const FilmAdd = () => {
         value={category}
         onChange={(e) => setCategory(e.target.value)}
       />
+
       <TextField
         label="Thời lượng (ví dụ: 121 phút 51 giây)"
         fullWidth
@@ -65,6 +73,7 @@ const FilmAdd = () => {
         value={duration}
         onChange={(e) => setDuration(e.target.value)}
       />
+
       <TextField
         label="Khởi chiếu"
         fullWidth
@@ -82,6 +91,17 @@ const FilmAdd = () => {
         value={imageUrl}
         onChange={(e) => setImageUrl(e.target.value)}
         placeholder="Nhập URL ảnh"
+      />
+
+      <TextField
+        label="Mô tả nội dung phim"
+        fullWidth
+        margin="normal"
+        multiline
+        rows={4}
+        value={description}
+        onChange={(e) => setDescription(e.target.value)}
+        placeholder="Nhập nội dung mô tả của phim"
       />
 
       <Button variant="contained" onClick={handleAdd}>

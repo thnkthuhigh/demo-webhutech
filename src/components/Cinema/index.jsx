@@ -1,9 +1,8 @@
-import {useState} from "react";
+import { useState, useEffect } from "react";
 import dayjs from "dayjs";
-import {LocalizationProvider} from "@mui/x-date-pickers/LocalizationProvider";
-import {AdapterDayjs} from "@mui/x-date-pickers/AdapterDayjs";
-import {DatePicker} from "@mui/x-date-pickers/DatePicker";
-
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { DatePicker } from "@mui/x-date-pickers/DatePicker";
 import {
   Container,
   Typography,
@@ -16,45 +15,75 @@ import {
   Button,
   Grid,
 } from "@mui/material";
-
-const cinemas = [
-  {id: 1, name: "CGV Hùng Vương Plaza"},
-  {id: 2, name: "CGV Crescent Mall"},
-  {id: 3, name: "CGV Vincom Thủ Đức"},
-];
-
-const movies = {
-  1: [
-    {
-      id: 101,
-      title: "Nàng Bạch Tuyết",
-      showtimes: ["08:50 AM", "11:30 AM", "16:00 PM"],
-    },
-    {id: 102, title: "Cô Gái Năm Ấy", showtimes: ["12:50 PM"]},
-  ],
-  2: [
-    {id: 103, title: "Nghề Siêu Khó", showtimes: ["11:50 AM", "14:00 PM"]},
-    {id: 104, title: "Yêu Vì Tiền", showtimes: ["20:40 PM"]},
-  ],
-  3: [{id: 105, title: "Siêu Anh Hùng", showtimes: ["10:00 AM", "13:00 PM"]}],
-};
+import { db } from "../../db.config"; // Đảm bảo rằng đường dẫn đúng
+import { collection, getDocs } from "firebase/firestore";
 
 export default function MovieSchedule() {
-  const [selectedCinema, setSelectedCinema] = useState(cinemas[0].id);
+  const [cinemas, setCinemas] = useState([]);
+  const [selectedCinema, setSelectedCinema] = useState(null);
   const [selectedDate, setSelectedDate] = useState(dayjs());
+  const [movies, setMovies] = useState({});
+
+  // Fetch cinemas from Firestore
+  useEffect(() => {
+    const fetchCinemas = async () => {
+      const snapshot = await getDocs(collection(db, "theaters"));
+      const cinemaData = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      setCinemas(cinemaData);
+      if (cinemaData.length > 0) {
+        setSelectedCinema(cinemaData[0].id); // Set default cinema
+      }
+    };
+    fetchCinemas();
+  }, []);
+
+  // Fetch movies for the selected cinema from Firestore
+  useEffect(() => {
+    if (selectedCinema) {
+      const fetchMovies = async () => {
+        const snapshot = await getDocs(collection(db, "movies"));
+        const movieData = snapshot.docs
+          .filter((doc) => doc.data().cinemaId === selectedCinema)
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+
+        const moviesByCinema = {};
+        movieData.forEach((movie) => {
+          if (!moviesByCinema[movie.cinemaId]) {
+            moviesByCinema[movie.cinemaId] = [];
+          }
+          moviesByCinema[movie.cinemaId].push(movie);
+        });
+
+        setMovies(moviesByCinema);
+      };
+      fetchMovies();
+    }
+  }, [selectedCinema]);
+
+  if (!cinemas.length) {
+    return <div>Loading cinemas...</div>;
+  }
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <Container sx={{mt: 4}}>
-        <Typography variant='h4' gutterBottom>
+      <Container sx={{ mt: 4 }}>
+        <Typography variant="h4" gutterBottom>
           Lịch Chiếu Phim
         </Typography>
 
-        <FormControl fullWidth sx={{mb: 3}}>
+        <FormControl fullWidth sx={{ mb: 3 }}>
           <InputLabel>Chọn Rạp</InputLabel>
           <Select
             value={selectedCinema}
-            onChange={(e) => setSelectedCinema(e.target.value)}>
+            onChange={(e) => setSelectedCinema(e.target.value)}
+            label="Chọn Rạp"
+          >
             {cinemas.map((cinema) => (
               <MenuItem key={cinema.id} value={cinema.id}>
                 {cinema.name}
@@ -64,10 +93,10 @@ export default function MovieSchedule() {
         </FormControl>
 
         <DatePicker
-          label='Chọn Ngày'
+          label="Chọn Ngày"
           value={selectedDate}
           onChange={(newDate) => setSelectedDate(newDate)}
-          sx={{mb: 3, width: "100%"}}
+          sx={{ mb: 3, width: "100%" }}
         />
 
         <Grid container spacing={2}>
@@ -75,11 +104,11 @@ export default function MovieSchedule() {
             <Grid item xs={12} md={6} key={movie.id}>
               <Card>
                 <CardContent>
-                  <Typography variant='h6'>{movie.title}</Typography>
-                  <Typography color='text.secondary'>
+                  <Typography variant="h6">{movie.title}</Typography>
+                  <Typography color="text.secondary">
                     Suất chiếu: {movie.showtimes.join(", ")}
                   </Typography>
-                  <Button variant='contained' sx={{mt: 1}}>
+                  <Button variant="contained" sx={{ mt: 1 }}>
                     Mua Vé
                   </Button>
                 </CardContent>

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { db } from "../../db.config";
+import { db } from "../../../db.config";
 import { collection, getDocs, deleteDoc, doc } from "firebase/firestore";
 import {
   Button,
@@ -32,7 +32,7 @@ const FilmList = () => {
   const handleDelete = async (id) => {
     try {
       await deleteDoc(doc(db, "movie", id));
-      setMovies(movies.filter((movie) => movie.id !== id)); // Cập nhật danh sách ngay lập tức
+      setMovies(movies.filter((movie) => movie.id !== id));
     } catch (error) {
       console.error("Lỗi khi xóa phim:", error);
     }
@@ -90,6 +90,15 @@ const FilmList = () => {
                       ? movie.releaseDate.toDate().toLocaleDateString("vi-VN")
                       : "Không xác định"}
                   </Typography>
+                  {movie.description && (
+                    <Typography
+                      variant="body2"
+                      color="text.secondary"
+                      sx={{ mt: 1 }}
+                    >
+                      {movie.description}
+                    </Typography>
+                  )}
                 </CardContent>
                 <CardActions>
                   <Button
