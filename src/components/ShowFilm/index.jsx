@@ -10,10 +10,11 @@ import {
   Box,
   Tabs,
   Tab,
+  Paper,
 } from "@mui/material";
 import { db } from "../../db.config";
-import { collection, getDocs } from "firebase/firestore";
-import { Timestamp } from "firebase/firestore";
+import { collection, getDocs, Timestamp } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export default function MovieList() {
   const [tabIndex, setTabIndex] = useState(0);
@@ -21,7 +22,7 @@ export default function MovieList() {
   const [moviesComingSoon, setMoviesComingSoon] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const fetchMovies = async () => {
       try {
@@ -32,24 +33,21 @@ export default function MovieList() {
 
         querySnapshot.forEach((doc) => {
           const movie = doc.data();
-
           let releaseDate = movie.releaseDate;
 
-          // Kiểm tra nếu releaseDate là Timestamp
+          // Chuyển đổi releaseDate
           if (releaseDate instanceof Timestamp) {
-            releaseDate = releaseDate.toDate(); // Chuyển đổi Timestamp thành Date object
+            releaseDate = releaseDate.toDate();
           } else if (typeof releaseDate === "string") {
-            releaseDate = new Date(releaseDate); // Nếu là chuỗi, chuyển thành Date
+            releaseDate = new Date(releaseDate);
           }
 
-          // Kiểm tra trường hợp nếu releaseDate không hợp lệ
           if (!(releaseDate instanceof Date) || isNaN(releaseDate)) {
-            releaseDate = new Date(0); // Nếu không hợp lệ, mặc định là 01/01/1970
+            releaseDate = new Date(0);
           }
 
           const movieWithId = { id: doc.id, ...movie, releaseDate };
 
-          // Phân loại phim dựa trên releaseDate
           if (releaseDate <= now) {
             nowShowing.push(movieWithId);
           } else {
@@ -61,7 +59,7 @@ export default function MovieList() {
         setMoviesComingSoon(comingSoon);
       } catch (err) {
         setError("Có lỗi xảy ra khi tải dữ liệu phim.");
-        console.error("Error fetching movies:", err);
+        console.error("Lỗi khi tải phim:", err);
       } finally {
         setLoading(false);
       }
@@ -71,25 +69,29 @@ export default function MovieList() {
   }, []);
 
   const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
+    return date instanceof Date && !isNaN(date)
+      ? `${date.getDate().toString().padStart(2, "0")}/${(date.getMonth() + 1)
+          .toString()
+          .padStart(2, "0")}/${date.getFullYear()}`
+      : "N/A";
   };
 
   const movies = tabIndex === 0 ? moviesNowShowing : moviesComingSoon;
 
   return (
-    <Container sx={{ marginY: "5rem" }}>
-      <Box sx={{ display: "flex", justifyContent: "center", mb: 2 }}>
+    <Container sx={{ my: 6 }}>
+      <Paper elevation={2} sx={{ mb: 4, p: 2, textAlign: "center" }}>
         <Tabs
           value={tabIndex}
           onChange={(e, newValue) => setTabIndex(newValue)}
+          centered
+          textColor="primary"
+          indicatorColor="primary"
         >
           <Tab label="Phim Đang Chiếu" />
           <Tab label="Phim Sắp Chiếu" />
         </Tabs>
-      </Box>
+      </Paper>
 
       {loading ? (
         <Typography variant="h6" align="center">
@@ -105,8 +107,8 @@ export default function MovieList() {
         </Typography>
       ) : (
         <Grid container spacing={3}>
-          {movies.map((movie, index) => (
-            <Grid item xs={12} sm={6} md={4} key={movie.id || index}>
+          {movies.map((movie) => (
+            <Grid item xs={12} sm={6} md={4} key={movie.id}>
               <Card
                 sx={{
                   display: "flex",
@@ -116,36 +118,28 @@ export default function MovieList() {
               >
                 <CardMedia
                   component="img"
-                  height="200"
-                  image={movie.img || "https://via.placeholder.com/150"}
+                  image={movie.img || "https://via.placeholder.com/300x400"}
                   alt={movie.title}
-                  sx={{
-                    padding: "8px", // Thêm padding xung quanh ảnh
-                    height: "auto",
-                    width: "100%",
-                    objectFit: "cover",
-                    objectPosition: "center",
-                    borderRadius: "8px", // Để ảnh có góc bo tròn nếu cần
-                  }}
+                  sx={{ height: 300, objectFit: "cover" }}
                 />
-                <CardContent sx={{ flexGrow: 1, paddingTop: 2 }}>
+                <CardContent sx={{ flexGrow: 1 }}>
                   <Typography variant="h6">{movie.title}</Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Thể loại: {movie.category}
+                    Thể loại: {movie.category || "Không rõ"}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Thời lượng: {movie.duration}
+                    Thời lượng: {movie.duration || "Không rõ"}
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
-                    Khởi chiếu:{" "}
-                    {movie.releaseDate instanceof Date
-                      ? formatDate(movie.releaseDate)
-                      : "N/A"}
+                    Khởi chiếu: {formatDate(movie.releaseDate)}
                   </Typography>
                 </CardContent>
-                {/* Nút mua vé nằm ở dưới cùng, căn chỉnh flex */}
-                <Box sx={{ marginTop: "auto", padding: "16px" }}>
-                  <Button variant="contained" sx={{ width: "100%" }}>
+                <Box sx={{ p: 2 }}>
+                  <Button
+                    variant="contained"
+                    fullWidth
+                    onClick={() => navigate(`/movie-detail/${movie.id}`)}
+                  >
                     Mua Vé
                   </Button>
                 </Box>

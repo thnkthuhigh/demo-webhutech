@@ -19,6 +19,7 @@ import {
 } from "@mui/material";
 import { db } from "../../db.config"; // Ensure the path is correct
 import { collection, getDocs } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export default function MovieSchedule() {
   const [cinemas, setCinemas] = useState([]);
@@ -26,7 +27,7 @@ export default function MovieSchedule() {
   const [selectedDate, setSelectedDate] = useState(dayjs());
   const [movies, setMovies] = useState([]);
   const [showtimes, setShowtimes] = useState([]);
-
+  const navigate = useNavigate();
   // Fetch cinemas from Firestore
   useEffect(() => {
     const fetchCinemas = async () => {
@@ -79,7 +80,7 @@ export default function MovieSchedule() {
       const movieShowtimes = showtimes.filter(
         (showtime) =>
           showtime.movieId === movie.id &&
-          dayjs(showtime.date).isSame(selectedDate, "day")
+          dayjs(showtime.date.seconds * 1000).isSame(selectedDate, "day") // Compare only the day, month, and year
       );
 
       // If the movie has showtimes on the selected date, combine with cinema and showtime
@@ -96,13 +97,6 @@ export default function MovieSchedule() {
       return null;
     })
     .filter((movie) => movie !== null);
-
-  const formatDate = (date) => {
-    const day = date.getDate().toString().padStart(2, "0");
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear();
-    return `${day}/${month}/${year}`;
-  };
 
   return (
     <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -167,8 +161,10 @@ export default function MovieSchedule() {
                   </Typography>
                   <Typography variant="body2" color="text.secondary">
                     Khởi chiếu:{" "}
-                    {movie.releaseDate instanceof Date
-                      ? formatDate(movie.releaseDate)
+                    {movie.releaseDate
+                      ? dayjs(movie.releaseDate.seconds * 1000).format(
+                          "DD/MM/YYYY"
+                        )
                       : "N/A"}
                   </Typography>
 
@@ -180,7 +176,7 @@ export default function MovieSchedule() {
                         color="text.secondary"
                         key={index}
                       >
-                        {showtime.cinema.name} - {showtime.time}
+                        Rạp {showtime.cinema.name} - {showtime.time}
                       </Typography>
                     ))
                   ) : (
@@ -190,7 +186,11 @@ export default function MovieSchedule() {
                   )}
                 </CardContent>
                 <Box sx={{ marginTop: "auto", padding: "16px" }}>
-                  <Button variant="contained" sx={{ width: "100%" }}>
+                  <Button
+                    variant="contained"
+                    sx={{ width: "100%" }}
+                    onClick={() => navigate(`/movie-detail/${movie.id}`)}
+                  >
                     Mua Vé
                   </Button>
                 </Box>

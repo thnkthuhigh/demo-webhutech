@@ -14,6 +14,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const auth = getAuth(app); // ⚠️ Bổ sung dòng này
+const auth = getAuth(app);
 
-export { db, auth }; // ⚠️ Xuất auth để sử dụng ở nơi khác
+export { db, auth };

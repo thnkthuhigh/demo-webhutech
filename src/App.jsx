@@ -27,25 +27,16 @@ import Navbar from "./components/Global/Header"; // Import Navbar
 import UserList from "./components/DataConTrol/Users/UserList";
 import UserAdd from "./components/DataConTrol/Users/UserAdd";
 import UserEdit from "./components/DataConTrol/Users/UserEdit";
-
+import News from "./components/News/index";
+import MovieDetail from "./components/BuyTicket/MovieDetail";
+import ConfirmTicket from "./components/ConfirmTicket/index";
+import MyTickets from "./components/MyTicket/index";
+import { Navigate } from "react-router-dom";
 function AppWrapper() {
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
 
   // Kiểm tra token khi load app
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const storedUser = JSON.parse(localStorage.getItem("userData"));
-        if (storedUser) {
-          setUserData(storedUser);
-        }
-      } catch (error) {
-        console.error("Lỗi khi đọc userData từ localStorage:", error);
-      }
-    }
-  }, []);
 
   // Hàm xử lý đăng xuất
   const handleLogout = () => {
@@ -54,6 +45,20 @@ function AppWrapper() {
     setUserData(null);
     navigate("/");
   };
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const storedUser = JSON.parse(localStorage.getItem("userData"));
+        if (storedUser) {
+          setUserData(storedUser); // Cập nhật userData nếu tồn tại
+        }
+      } catch (error) {
+        console.error("Lỗi khi đọc userData từ localStorage:", error);
+      }
+    }
+  }, []);
 
   return (
     <Box display="flex" flexDirection="column" minHeight="100vh">
@@ -66,7 +71,6 @@ function AppWrapper() {
           <Route path="/phim" element={<Film />} />
           <Route path="/rap" element={<Cinema />} />
           <Route path="/thanh-vien" element={<Body />} />
-
           {/* Trang dành cho Admin */}
           <Route path="/quan-ly-phim" element={<FilmList />} />
           <Route path="/phim/them" element={<FilmAdd />} />
@@ -75,7 +79,6 @@ function AppWrapper() {
           <Route path="/quan-ly-rap" element={<TheaterList />} />
           <Route path="/quan-ly-suat-chieu" element={<ShowtimeList />} />
           <Route path="/suatchieu/them" element={<ShowtimeAdd />} />
-
           {/* Đăng nhập, đăng ký */}
           <Route path="/login" element={<Login setUserData={setUserData} />} />
           <Route
@@ -85,6 +88,19 @@ function AppWrapper() {
           <Route path="/quan-ly-nguoi-dung" element={<UserList />} />
           <Route path="/them-nguoi-dung" element={<UserAdd />} />
           <Route path="/sua-nguoi-dung/:email" element={<UserEdit />} />
+          <Route path="/news" element={<News />} />
+          <Route path="/movie-detail/:id" element={<MovieDetail />} />\
+          <Route path="/confirm-ticket" element={<ConfirmTicket />} />
+          <Route
+            path="/my-ticket"
+            element={
+              userData ? (
+                <MyTickets email={userData.email} />
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
         </Routes>
       </Box>
 

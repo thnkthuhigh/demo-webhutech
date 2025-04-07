@@ -23,18 +23,21 @@ const Navbar = ({ userData, onLogout }) => {
         <Box sx={{ display: "flex", gap: 1, mx: "120px" }}>
           <Button
             component={Link}
-            to="/tin-moi"
+            to="/news"
             sx={{ color: "white", fontSize: "12px", padding: "4px 8px" }}
           >
             TIN MỚI & ƯU ĐÃI
           </Button>
-          <Button
-            component={Link}
-            to="/ve-cua-toi"
-            sx={{ color: "white", fontSize: "12px", padding: "4px 8px" }}
-          >
-            VÉ CỦA TÔI
-          </Button>
+          {/* Hiển thị "Vé Của Tôi" chỉ khi người dùng đã đăng nhập */}
+          {userData && (
+            <Button
+              component={Link}
+              to="/my-ticket"
+              sx={{ color: "white", fontSize: "12px", padding: "4px 8px" }}
+            >
+              VÉ CỦA TÔI
+            </Button>
+          )}
         </Box>
         {userData ? (
           <>

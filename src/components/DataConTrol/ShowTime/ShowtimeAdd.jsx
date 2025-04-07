@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { db } from "../../../db.config";
 import { collection, addDoc, getDocs } from "firebase/firestore";
+import { Timestamp } from "firebase/firestore"; // Thêm import cho Timestamp
 import {
   TextField,
   Button,
@@ -44,10 +45,29 @@ const ShowtimeAdd = () => {
   }, []);
 
   const handleAddShowtime = async () => {
+    if (!date || !time || !selectedMovie || !selectedTheater) {
+      alert("Vui lòng nhập đầy đủ thông tin.");
+      return;
+    }
+
+    const showDate = new Date(date);
+    if (isNaN(showDate.getTime())) {
+      alert("Ngày không hợp lệ.");
+      return;
+    }
+
+    const showTimeParts = time.split(":");
+    if (showTimeParts.length !== 2) {
+      alert("Giờ không hợp lệ.");
+      return;
+    }
+
+    showDate.setHours(showTimeParts[0], showTimeParts[1], 0, 0);
+
     await addDoc(collection(db, "showtimes"), {
       movieId: selectedMovie,
       theaterId: selectedTheater,
-      date,
+      date: Timestamp.fromDate(showDate),
       time,
     });
 
