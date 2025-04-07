@@ -1,4 +1,4 @@
-import {useState} from "react";
+import { useState } from "react";
 
 import {
   Box,
@@ -40,11 +40,12 @@ const MovieSchedule = () => {
   const [selectedDate, setSelectedDate] = useState(0);
 
   return (
-    <Box sx={{p: 4}}>
+    <Box sx={{ p: 4 }}>
       <Typography
-        variant='h4'
-        align='center'
-        sx={{mb: 3, fontWeight: "bold", color: "#E91E63"}}>
+        variant="h4"
+        align="center"
+        sx={{ mb: 3, fontWeight: "bold", color: "#E91E63" }}
+      >
         Lịch chiếu phim
       </Typography>
 
@@ -52,23 +53,25 @@ const MovieSchedule = () => {
       <Tabs
         value={selectedCinema}
         onChange={(e, newValue) => setSelectedCinema(newValue)}
-        variant='scrollable'
+        variant="scrollable"
         scrollButtons
         allowScrollButtonsMobile
-        sx={{mb: 3, bgcolor: "#FCE4EC"}}>
+        sx={{ mb: 3, bgcolor: "#FCE4EC" }}
+      >
         {cinemas.map((cinema, index) => (
           <Tab key={index} label={cinema} />
         ))}
       </Tabs>
 
       {/* Chọn ngày */}
-      <Box sx={{display: "flex", justifyContent: "center", gap: 2, mb: 3}}>
+      <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mb: 3 }}>
         {["25", "26", "27", "28", "29", "30", "31"].map((day, index) => (
           <Button
             key={index}
             variant={selectedDate === index ? "contained" : "outlined"}
-            color='secondary'
-            onClick={() => setSelectedDate(index)}>
+            color="secondary"
+            onClick={() => setSelectedDate(index)}
+          >
             {day}
           </Button>
         ))}
@@ -80,18 +83,18 @@ const MovieSchedule = () => {
           <Grid item xs={12} md={6} key={index}>
             <Card>
               <CardMedia
-                component='img'
-                height='200'
+                component="img"
+                height="200"
                 image={movie.poster}
                 alt={movie.title}
               />
               <CardContent>
-                <Typography variant='h6' sx={{fontWeight: "bold"}}>
+                <Typography variant="h6" sx={{ fontWeight: "bold" }}>
                   {movie.title}
                 </Typography>
-                <Box sx={{mt: 1, display: "flex", gap: 1, flexWrap: "wrap"}}>
+                <Box sx={{ mt: 1, display: "flex", gap: 1, flexWrap: "wrap" }}>
                   {movie.showtimes.map((time, idx) => (
-                    <Button key={idx} variant='outlined' color='primary'>
+                    <Button key={idx} variant="outlined" color="primary">
                       {time}
                     </Button>
                   ))}

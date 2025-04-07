@@ -119,7 +119,7 @@ const Navbar = ({ userData, onLogout }) => {
                       position: "absolute",
                       top: "100%",
                       left: 0,
-                      bgcolor: "#F48FB1",
+                      bgcolor: "white",
                       boxShadow: 3,
                       borderRadius: 1,
                       zIndex: 10,
