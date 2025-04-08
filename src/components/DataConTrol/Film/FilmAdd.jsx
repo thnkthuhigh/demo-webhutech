@@ -8,9 +8,10 @@ const FilmAdd = () => {
   const [title, setTitle] = useState("");
   const [category, setCategory] = useState("");
   const [duration, setDuration] = useState("");
-  const [releaseDate, setReleaseDate] = useState(""); // yyyy-mm-dd
-  const [imageUrl, setImageUrl] = useState(""); // URL ảnh
-  const [description, setDescription] = useState(""); // Mô tả nội dung phim
+  const [releaseDate, setReleaseDate] = useState("");
+  const [imageUrl, setImageUrl] = useState("");
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState(""); // Trường giá phim
   const navigate = useNavigate();
 
   const handleAdd = async () => {
@@ -20,7 +21,8 @@ const FilmAdd = () => {
       !duration ||
       !releaseDate ||
       !imageUrl ||
-      !description
+      !description ||
+      !price
     ) {
       alert("Vui lòng điền đầy đủ thông tin.");
       return;
@@ -36,6 +38,7 @@ const FilmAdd = () => {
         releaseDate: Timestamp.fromDate(dateObject),
         img: imageUrl,
         description,
+        price: parseInt(price), // Lưu dưới dạng số nguyên
       });
 
       navigate("/phimx");
@@ -102,6 +105,16 @@ const FilmAdd = () => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Nhập nội dung mô tả của phim"
+      />
+
+      <TextField
+        label="Giá vé (VND)"
+        fullWidth
+        margin="normal"
+        type="number"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        placeholder="Ví dụ: 75000"
       />
 
       <Button variant="contained" onClick={handleAdd}>

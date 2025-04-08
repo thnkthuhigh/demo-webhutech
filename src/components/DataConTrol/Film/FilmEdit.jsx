@@ -13,7 +13,8 @@ const FilmEdit = () => {
   const [duration, setDuration] = useState("");
   const [releaseDate, setReleaseDate] = useState("");
   const [imageUrl, setImageUrl] = useState("");
-  const [description, setDescription] = useState(""); // Thêm state cho mô tả
+  const [description, setDescription] = useState("");
+  const [price, setPrice] = useState(""); // ➕ Trường giá vé
 
   useEffect(() => {
     const fetchMovie = async () => {
@@ -26,7 +27,8 @@ const FilmEdit = () => {
           setCategory(movie.category || "");
           setDuration(movie.duration || "");
           setImageUrl(movie.img || "");
-          setDescription(movie.description || ""); // Lấy mô tả nếu có
+          setDescription(movie.description || "");
+          setPrice(movie.price?.toString() || ""); // ➕ Lấy giá vé
 
           if (movie.releaseDate?.toDate) {
             const dateObj = movie.releaseDate.toDate();
@@ -60,10 +62,11 @@ const FilmEdit = () => {
         duration,
         releaseDate: timestamp,
         img: imageUrl,
-        description, // Cập nhật mô tả
+        description,
+        price: parseInt(price), // ➕ Cập nhật giá vé
       });
 
-      navigate("/phimx");
+      navigate("/quan-ly-phim");
     } catch (error) {
       console.error("Lỗi khi cập nhật phim:", error);
     }
@@ -122,6 +125,15 @@ const FilmEdit = () => {
         value={description}
         onChange={(e) => setDescription(e.target.value)}
         placeholder="Nhập nội dung mô tả"
+      />
+      <TextField
+        label="Giá vé (VND)"
+        fullWidth
+        margin="normal"
+        type="number"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        placeholder="Ví dụ: 75000"
       />
 
       <Button variant="contained" onClick={handleUpdate}>

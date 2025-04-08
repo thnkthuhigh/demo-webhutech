@@ -90,6 +90,12 @@ const FilmList = () => {
                       ? movie.releaseDate.toDate().toLocaleDateString("vi-VN")
                       : "Không xác định"}
                   </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Giá vé:{" "}
+                    {movie.price
+                      ? movie.price.toLocaleString("vi-VN") + " ₫"
+                      : "Không rõ"}
+                  </Typography>
                   {movie.description && (
                     <Typography
                       variant="body2"

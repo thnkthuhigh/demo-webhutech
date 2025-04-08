@@ -32,6 +32,7 @@ import MovieDetail from "./components/BuyTicket/MovieDetail";
 import ConfirmTicket from "./components/ConfirmTicket/index";
 import MyTickets from "./components/MyTicket/index";
 import { Navigate } from "react-router-dom";
+import SeatSelection from "./components/SeatSelection/SeatSelection";
 function AppWrapper() {
   const [userData, setUserData] = useState(null);
   const navigate = useNavigate();
@@ -101,6 +102,7 @@ function AppWrapper() {
               )
             }
           />
+          <Route path="/select-seat" element={<SeatSelection />} />
         </Routes>
       </Box>
 

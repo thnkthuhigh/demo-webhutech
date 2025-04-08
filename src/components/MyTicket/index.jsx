@@ -38,7 +38,7 @@ const MyTickets = ({ email }) => {
   };
 
   return (
-    <Box sx={{ padding: 3 }}>
+    <Box sx={{ padding: 3, textAlign: "center" }}>
       <Typography variant="h4" gutterBottom>
         Vé của tôi
       </Typography>

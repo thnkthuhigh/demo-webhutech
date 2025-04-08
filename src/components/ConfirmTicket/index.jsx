@@ -13,146 +13,127 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { db } from "../../db.config";
 import {
   collection,
   query,
   where,
   getDocs,
-  addDoc,
-  getDoc,
   doc,
+  getDoc,
 } from "firebase/firestore";
-import { getAuth } from "firebase/auth"; // Import Firebase Auth
+import { getAuth } from "firebase/auth";
 
 export default function TicketConfirmation() {
   const { state: movie } = useLocation();
+  const navigate = useNavigate();
+
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [dates, setDates] = useState([]);
   const [cinemas, setCinemas] = useState([]);
   const [selectedCinema, setSelectedCinema] = useState(null);
   const [showtimes, setShowtimes] = useState({});
   const [theaters, setTheaters] = useState({});
-  const [user, setUser] = useState(null); // State lưu thông tin người dùng
-  const [userDetails, setUserDetails] = useState(null); // State lưu thông tin chi tiết người dùng
-  const [openDialog, setOpenDialog] = useState(false); // State để mở bảng thông báo
-  const [dialogMessage, setDialogMessage] = useState(""); // Nội dung thông báo
+  const [user, setUser] = useState(null);
+  const [userDetails, setUserDetails] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [dialogMessage, setDialogMessage] = useState("");
 
-  // Tạo danh sách 10 ngày tiếp theo
+  // Khởi tạo danh sách 10 ngày tới
   useEffect(() => {
     const today = new Date();
-    const tempDates = Array.from({ length: 10 }, (_, i) => {
-      const nextDate = new Date(today);
-      nextDate.setDate(today.getDate() + i);
-      return nextDate;
+    const futureDates = Array.from({ length: 10 }, (_, i) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      return date;
     });
-    setDates(tempDates);
+    setDates(futureDates);
   }, []);
 
-  // Lấy thông tin người dùng
+  // Lấy thông tin người dùng từ Firebase Auth và Firestore
   useEffect(() => {
     const auth = getAuth();
     const currentUser = auth.currentUser;
-    if (currentUser) {
-      setUser(currentUser); // Lưu thông tin người dùng vào state
+    if (!currentUser) return;
 
-      // Truy vấn thông tin chi tiết người dùng từ bảng 'users'
-      const fetchUserDetails = async () => {
-        const userRef = doc(db, "users", currentUser.uid);
-        const userSnapshot = await getDoc(userRef);
-        if (userSnapshot.exists()) {
-          setUserDetails(userSnapshot.data()); // Lưu thông tin chi tiết người dùng
-        } else {
-          console.log("Không tìm thấy thông tin người dùng.");
-        }
-      };
+    setUser(currentUser);
 
-      fetchUserDetails();
-    }
+    const fetchUser = async () => {
+      const userRef = doc(db, "users", currentUser.uid);
+      const userSnap = await getDoc(userRef);
+      if (userSnap.exists()) {
+        setUserDetails(userSnap.data());
+      } else {
+        console.warn("Không tìm thấy thông tin người dùng.");
+      }
+    };
+
+    fetchUser();
   }, []);
 
-  // Lấy thông tin các rạp từ Firestore
+  // Lấy danh sách rạp
   useEffect(() => {
     const fetchTheaters = async () => {
-      const q = query(collection(db, "theaters"));
-      const querySnapshot = await getDocs(q);
-      const theaterData = {};
-      querySnapshot.forEach((doc) => {
-        theaterData[doc.id] = doc.data(); // Lưu thông tin đầy đủ của mỗi rạp chiếu
+      const theaterQuery = query(collection(db, "theaters"));
+      const snapshot = await getDocs(theaterQuery);
+      const theaterMap = {};
+      snapshot.forEach((doc) => {
+        theaterMap[doc.id] = doc.data();
       });
-      setTheaters(theaterData);
+      setTheaters(theaterMap);
     };
 
     fetchTheaters();
   }, []);
 
-  // Lấy thông tin suất chiếu từ Firestore
+  // Lấy danh sách suất chiếu theo phim và ngày
   useEffect(() => {
     const fetchShowtimes = async () => {
       if (!movie?.id) return;
 
       const q = query(
         collection(db, "showtimes"),
-        where("movieId", "==", movie.id) // Lọc theo ID phim
+        where("movieId", "==", movie.id)
       );
-      const querySnapshot = await getDocs(q);
+      const snapshot = await getDocs(q);
+      const result = {};
+      const selectedDay = selectedDate.setHours(0, 0, 0, 0);
 
-      const data = {};
-      const selectedDay = selectedDate.setHours(0, 0, 0, 0); // Đặt giờ, phút, giây thành 0 để so sánh chỉ ngày
-
-      querySnapshot.forEach((doc) => {
-        const item = doc.data();
-        const showDate = new Date(item.date.seconds * 1000).setHours(
+      snapshot.forEach((docSnap) => {
+        const showtime = docSnap.data();
+        const showDate = new Date(showtime.date.seconds * 1000).setHours(
           0,
           0,
           0,
           0
-        ); // Đặt giờ, phút, giây của Firestore thành 0
+        );
 
-        // So sánh ngày (không so sánh giờ)
         if (showDate === selectedDay) {
-          const theaterId = item.theaterId; // Kiểm tra trường 'theaterId'
-
-          if (theaterId) {
-            if (!data[theaterId]) data[theaterId] = [];
-            // Lọc suất chiếu theo ID của rạp và phim
-            data[theaterId].push({
-              id: doc.id,
-              ...item,
-              time: new Date(item.date.seconds * 1000).toLocaleTimeString(
-                "vi-VN",
-                {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                }
-              ), // Định dạng giờ chiếu
-            });
-          }
+          const theaterId = showtime.theaterId;
+          if (!result[theaterId]) result[theaterId] = [];
+          result[theaterId].push({
+            id: docSnap.id,
+            ...showtime,
+            time: new Date(showtime.date.seconds * 1000).toLocaleTimeString(
+              "vi-VN",
+              {
+                hour: "2-digit",
+                minute: "2-digit",
+              }
+            ),
+          });
         }
       });
 
-      // Cập nhật lại state sau khi lọc
-      setShowtimes(data);
-
-      // Lọc ra các rạp có suất chiếu trong ngày đã chọn
-      const availableCinemas = Object.keys(data);
-      setCinemas(availableCinemas);
+      setShowtimes(result);
+      setCinemas(Object.keys(result));
     };
 
     fetchShowtimes();
   }, [movie, selectedDate]);
 
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-  };
-
-  const handleCinemaChange = (cinema) => {
-    setSelectedCinema(cinema);
-  };
-
-  const handleConfirm = async (showtime) => {
-    // Kiểm tra nếu chưa có người dùng đăng nhập
+  const handleConfirm = (showtime) => {
     if (!user || !userDetails) {
       setDialogMessage("Vui lòng đăng nhập để mua vé.");
       setOpenDialog(true);
@@ -167,30 +148,13 @@ export default function TicketConfirmation() {
       date: selectedDate.toISOString(),
       showtimeId: showtime.id,
       time: showtime.time,
-      createdAt: new Date().toISOString(),
-      userId: user.uid, // Lưu ID người dùng
-      userEmail: userDetails.email, // Lưu email người dùng
-      userRole: userDetails.role, // Lưu vai trò người dùng (admin/user)
-      userName: userDetails.username || "Không rõ tên", // Lưu tên người dùng
+      userId: user.uid,
+      userEmail: userDetails.email,
+      userRole: userDetails.role,
+      userName: userDetails.username || "Không rõ tên",
     };
 
-    try {
-      await addDoc(collection(db, "tickets"), ticket);
-      setDialogMessage(
-        `Bạn đã chọn vé:\n${
-          movie.title
-        } | ${selectedDate.toLocaleDateString()} | ${
-          theaters[selectedCinema]?.name
-        } | ${showtime.time}\nNgười mua: ${
-          userDetails.username || "Không rõ tên"
-        }`
-      );
-      setOpenDialog(true);
-    } catch (error) {
-      console.error("Lỗi khi ghi vé:", error);
-      setDialogMessage("Đặt vé thất bại. Vui lòng thử lại.");
-      setOpenDialog(true);
-    }
+    navigate("/select-seat", { state: { ticket } });
   };
 
   return (
@@ -204,13 +168,13 @@ export default function TicketConfirmation() {
         <ToggleButtonGroup
           exclusive
           value={selectedDate}
-          onChange={(e, val) => val && handleDateChange(val)}
+          onChange={(e, val) => val && setSelectedDate(val)}
         >
           {dates.map((date, i) => (
             <ToggleButton
               key={i}
               value={date}
-              sx={{ borderRadius: "8px", padding: "8px 16px", margin: "0 8px" }}
+              sx={{ borderRadius: 2, px: 2, mx: 1 }}
             >
               {date.getDate().toString().padStart(2, "0")}/
               {(date.getMonth() + 1).toString().padStart(2, "0")}
@@ -224,58 +188,45 @@ export default function TicketConfirmation() {
         <ToggleButtonGroup
           exclusive
           value={selectedCinema}
-          onChange={(e, val) => val && handleCinemaChange(val)}
+          onChange={(e, val) => val && setSelectedCinema(val)}
         >
           {cinemas.length > 0 ? (
-            cinemas.map((cinemaId, i) => (
+            cinemas.map((id) => (
               <ToggleButton
-                key={i}
-                value={cinemaId}
+                key={id}
+                value={id}
                 sx={{
-                  borderRadius: "8px",
-                  padding: "8px 16px",
-                  margin: "0 8px",
-                  backgroundColor: "#f5f5f5",
+                  borderRadius: 2,
+                  px: 2,
+                  mx: 1,
+                  bgcolor: "#f5f5f5",
                   "&.Mui-selected": {
-                    backgroundColor: "#1976d2",
+                    bgcolor: "#1976d2",
                     color: "#fff",
                   },
                 }}
               >
-                {theaters[cinemaId]?.name || "Không rõ rạp"}
+                {theaters[id]?.name || "Không rõ rạp"}
               </ToggleButton>
             ))
           ) : (
-            <Typography variant="body1">
-              Không có rạp chiếu cho ngày đã chọn.
-            </Typography>
+            <Typography>Không có rạp chiếu cho ngày đã chọn.</Typography>
           )}
         </ToggleButtonGroup>
       </Box>
 
-      {/* Danh sách suất chiếu */}
+      {/* Suất chiếu */}
       {selectedCinema && showtimes[selectedCinema]?.length > 0 ? (
         <Grid container spacing={2}>
           {showtimes[selectedCinema].map((s) => (
             <Grid item xs={12} sm={6} md={4} key={s.id}>
-              <Paper
-                elevation={3}
-                sx={{ p: 2, borderRadius: "8px", boxShadow: 3 }}
-              >
-                <Typography variant="body1" color="textSecondary">
-                  Rạp: {theaters[selectedCinema]?.name}
-                </Typography>
-                <Typography variant="body2" color="textSecondary">
-                  Giờ chiếu: {s.time}
-                </Typography>
+              <Paper sx={{ p: 2, borderRadius: 2, boxShadow: 3 }}>
+                <Typography>Rạp: {theaters[selectedCinema]?.name}</Typography>
+                <Typography>Giờ chiếu: {s.time}</Typography>
                 <Button
-                  variant="contained"
                   fullWidth
-                  sx={{
-                    mt: 1,
-                    backgroundColor: "#1976d2",
-                    "&:hover": { backgroundColor: "#115293" },
-                  }}
+                  variant="contained"
+                  sx={{ mt: 1 }}
                   onClick={() => handleConfirm(s)}
                 >
                   Chọn vé
@@ -285,9 +236,7 @@ export default function TicketConfirmation() {
           ))}
         </Grid>
       ) : (
-        <Typography variant="body1" color="textSecondary">
-          Không có suất chiếu cho rạp này.
-        </Typography>
+        <Typography>Không có suất chiếu cho rạp này.</Typography>
       )}
 
       {/* Dialog thông báo */}
@@ -297,9 +246,7 @@ export default function TicketConfirmation() {
           <Typography>{dialogMessage}</Typography>
         </DialogContent>
         <DialogActions>
-          <Button onClick={() => setOpenDialog(false)} color="primary">
-            Đóng
-          </Button>
+          <Button onClick={() => setOpenDialog(false)}>Đóng</Button>
         </DialogActions>
       </Dialog>
     </Container>

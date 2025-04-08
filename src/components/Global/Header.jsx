@@ -84,107 +84,134 @@ const Navbar = ({ userData, onLogout }) => {
           display: "flex",
           alignItems: "center",
           padding: "8px 16px",
-          justifyContent: "center",
+          justifyContent: "space-between",
+          position: "relative",
         }}
       >
-        <Box sx={{ display: "flex", alignItems: "center", gap: 5 }}>
-          <Box component={Link} to="/" sx={{ height: "64px", display: "flex" }}>
-            <CinematIcon />
-          </Box>
+        {/* Logo bên trái */}
+        <Box component={Link} to="/" sx={{ height: "64px", display: "flex" }}>
+          <CinematIcon />
+        </Box>
 
-          <Box sx={{ display: "flex", gap: 3 }}>
-            <Button component={Link} to="/phim" sx={{ color: "black" }}>
-              PHIM
-            </Button>
-            <Button component={Link} to="/rap" sx={{ color: "black" }}>
-              RẠP FOUREEL
-            </Button>
-            <Button component={Link} to="/thanh-vien" sx={{ color: "black" }}>
-              THÀNH VIÊN
-            </Button>
+        {/* Menu giữa */}
+        <Box
+          sx={{
+            position: "absolute",
+            left: "50%",
+            transform: "translateX(-50%)",
+            display: "flex",
+            alignItems: "center",
+            gap: 3,
+          }}
+        >
+          <Button component={Link} to="/phim" sx={{ color: "black" }}>
+            PHIM
+          </Button>
+          <Button component={Link} to="/rap" sx={{ color: "black" }}>
+            RẠP FOUREEL
+          </Button>
 
-            {userData && userData.role === "admin" && (
-              <Box
-                sx={{
-                  position: "relative",
-                  display: "inline-block",
-                }}
-                onMouseEnter={() => setOpenManagement(true)}
-                onMouseLeave={() => setOpenManagement(false)}
-              >
-                <Button color="inherit" sx={{ color: "black" }}>
-                  Quản Lý
-                </Button>
+          {userData?.role === "admin" && (
+            <Box
+              sx={{
+                position: "relative",
+                display: "inline-block",
+              }}
+              onMouseEnter={() => setOpenManagement(true)}
+              onMouseLeave={() => setOpenManagement(false)}
+            >
+              <Button color="inherit" sx={{ color: "black" }}>
+                Quản Lý
+              </Button>
 
-                {openManagement && (
-                  <Box
+              {openManagement && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    bgcolor: "white",
+                    boxShadow: 3,
+                    borderRadius: 1,
+                    zIndex: 10,
+                    padding: "0.5rem",
+                    border: "solid 2px black",
+                    minWidth: "max-content",
+                  }}
+                >
+                  <Button
+                    component={Link}
+                    to="/quan-ly-phim"
                     sx={{
-                      position: "absolute",
-                      top: "100%",
-                      left: 0,
-                      bgcolor: "white",
-                      boxShadow: 3,
-                      borderRadius: 1,
-                      zIndex: 10,
-                      padding: "0.5rem",
-                      border: "solid 2px black",
-                      minWidth: "max-content",
+                      display: "block",
+                      textAlign: "left",
+                      width: "100%",
+                      color: "black",
                     }}
                   >
-                    <Button
-                      component={Link}
-                      to="/quan-ly-phim"
-                      sx={{
-                        display: "block",
-                        textAlign: "left",
-                        width: "100%",
-                        color: "black",
-                      }}
-                    >
-                      Quản Lý Phim
-                    </Button>
-                    <Button
-                      component={Link}
-                      to="/quan-ly-rap"
-                      sx={{
-                        display: "block",
-                        textAlign: "left",
-                        width: "100%",
-                        color: "black",
-                      }}
-                    >
-                      Quản Lý Rạp
-                    </Button>
-                    <Button
-                      component={Link}
-                      to="/quan-ly-suat-chieu"
-                      sx={{
-                        display: "block",
-                        textAlign: "left",
-                        width: "100%",
-                        color: "black",
-                      }}
-                    >
-                      Quản Lý Suất Chiếu
-                    </Button>
-                    <Button
-                      component={Link}
-                      to="/quan-ly-nguoi-dung"
-                      sx={{
-                        display: "block",
-                        textAlign: "left",
-                        width: "100%",
-                        color: "black",
-                      }}
-                    >
-                      Quản Lý Người Dùng
-                    </Button>
-                  </Box>
-                )}
-              </Box>
-            )}
-          </Box>
+                    Quản Lý Phim
+                  </Button>
+                  <Button
+                    component={Link}
+                    to="/quan-ly-rap"
+                    sx={{
+                      display: "block",
+                      textAlign: "left",
+                      width: "100%",
+                      color: "black",
+                    }}
+                  >
+                    Quản Lý Rạp
+                  </Button>
+                  <Button
+                    component={Link}
+                    to="/quan-ly-suat-chieu"
+                    sx={{
+                      display: "block",
+                      textAlign: "left",
+                      width: "100%",
+                      color: "black",
+                    }}
+                  >
+                    Quản Lý Suất Chiếu
+                  </Button>
+                  <Button
+                    component={Link}
+                    to="/quan-ly-nguoi-dung"
+                    sx={{
+                      display: "block",
+                      textAlign: "left",
+                      width: "100%",
+                      color: "black",
+                    }}
+                  >
+                    Quản Lý Người Dùng
+                  </Button>
+                </Box>
+              )}
+            </Box>
+          )}
         </Box>
+
+        {/* Nút mua vé bên phải */}
+        <Button
+          component={Link}
+          to="/phim"
+          variant="contained"
+          sx={{
+            bgcolor: "#D32F2F",
+            color: "#fff",
+            fontWeight: "bold",
+            borderRadius: "20px",
+            px: 3,
+            py: 1,
+            "&:hover": {
+              bgcolor: "#B71C1C",
+            },
+          }}
+        >
+          MUA VÉ NGAY
+        </Button>
       </Toolbar>
     </AppBar>
   );
