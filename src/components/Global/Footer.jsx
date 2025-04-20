@@ -29,13 +29,13 @@ const Footer = () => {
               MUA VÉ XEM PHIM
             </Typography>
             <Stack spacing={1}>
-              <Link href="#" underline="hover" color="inherit">
+              <Link href="/phim" underline="hover" color="inherit">
                 Lịch chiếu phim
               </Link>
-              <Link href="#" underline="hover" color="inherit">
+              <Link href="/rap" underline="hover" color="inherit">
                 Rạp chiếu phim
               </Link>
-              <Link href="#" underline="hover" color="inherit">
+              <Link href="/phim" underline="hover" color="inherit">
                 Phim chiếu rạp
               </Link>
             </Stack>
@@ -47,7 +47,7 @@ const Footer = () => {
               DỊCH VỤ NỔI BẬT
             </Typography>
             <Stack spacing={1}>
-              <Link href="#" underline="hover" color="inherit">
+              <Link href="phim" underline="hover" color="inherit">
                 Đặt vé nhanh
               </Link>
               <Link href="#" underline="hover" color="inherit">

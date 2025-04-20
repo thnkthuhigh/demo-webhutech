@@ -9,7 +9,7 @@ const Navbar = ({ userData, onLogout }) => {
   const [openManagement, setOpenManagement] = useState(false);
 
   return (
-    <AppBar position="static" sx={{ bgcolor: "#ffffff " }}>
+    <AppBar position="static" sx={{ bgcolor: "#ffffff", zIndex: 1200 }}>
       <Toolbar
         sx={{
           display: "flex",
@@ -89,8 +89,30 @@ const Navbar = ({ userData, onLogout }) => {
         }}
       >
         {/* Logo bên trái */}
-        <Box component={Link} to="/" sx={{ height: "64px", display: "flex" }}>
+        <Box
+          component={Link}
+          to="/"
+          sx={{
+            height: "64px",
+            display: "flex",
+            flexDirection: "row",
+            justifyContent: "space-between",
+            alignItems: "center",
+            textDecoration: "none",
+            color: "black",
+            gap: 2,
+          }}
+        >
           <CinematIcon />
+          <Box
+            sx={{
+              fontSize: "1rem",
+              fontWeight: "bold",
+              alignSelf: "flex-end",
+            }}
+          >
+            FOUREEL
+          </Box>
         </Box>
 
         {/* Menu giữa */}
@@ -133,7 +155,7 @@ const Navbar = ({ userData, onLogout }) => {
                     bgcolor: "white",
                     boxShadow: 3,
                     borderRadius: 1,
-                    zIndex: 10,
+                    zIndex: 1300, // <-- tăng lên cao hơn
                     padding: "0.5rem",
                     border: "solid 2px black",
                     minWidth: "max-content",

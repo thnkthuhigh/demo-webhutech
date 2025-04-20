@@ -20,8 +20,10 @@
     "demo-web_dat_ve_phim": "file:",
     "firebase": "^11.6.0",
     "prop-types": "^15.8.1",
+    "qrcode.react": "^4.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "react-qr-code": "^2.0.15",
     "react-router-dom": "^7.4.0",
     "react-slick": "^0.30.3",
     "slick-carousel": "^1.8.1"

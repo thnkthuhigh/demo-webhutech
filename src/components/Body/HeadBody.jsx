@@ -6,9 +6,21 @@ import "slick-carousel/slick/slick-theme.css";
 import PropTypes from "prop-types";
 
 const movies = [
-  { id: 1, title: "Lạc Trôi", img: "/src/assets/img/1.jpg" },
-  { id: 2, title: "Cô Tiên", img: "/src/assets/img/2.jpg" },
-  { id: 3, title: "Dune 2", img: "/src/assets/img/3.jpg" },
+  {
+    id: 1,
+    title: "Lạc Trôi",
+    img: "https://image.dienthoaivui.com.vn/x,webp,q90/https://dashboard.dienthoaivui.com.vn/uploads/dashboard/editor_upload/poster-phim-hoat-hinh-38.jpg",
+  },
+  {
+    id: 2,
+    title: "Cô Tiên",
+    img: "https://afamilycdn.com/150157425591193600/2021/10/4/phim-kingdom-vuong-trieu-xac-song-phan-1-2-full-hd-vietsub-1-16333243807721978567362-0-0-394-630-crop-1633326547679730083843.jpg",
+  },
+  {
+    id: 3,
+    title: "Dune 2",
+    img: "https://i.pinimg.com/736x/78/09/bd/7809bde1142d2c87b8560f3be70b34b1.jpg",
+  },
 ];
 
 const NextArrow = ({ onClick }) => (

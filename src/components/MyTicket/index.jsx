@@ -1,11 +1,23 @@
 import { useEffect, useState } from "react";
 import { db } from "../../db.config";
 import { collection, query, where, getDocs } from "firebase/firestore";
-import { Card, CardContent, Typography, Box, Grid } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Typography,
+  Box,
+  Grid,
+  Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+} from "@mui/material";
 import PropTypes from "prop-types";
+import QRCode from "react-qr-code";
 
 const MyTickets = ({ email }) => {
   const [tickets, setTickets] = useState([]);
+  const [selectedTicket, setSelectedTicket] = useState(null);
 
   useEffect(() => {
     const fetchTickets = async () => {
@@ -14,7 +26,7 @@ const MyTickets = ({ email }) => {
       const q = query(
         collection(db, "tickets"),
         where("userEmail", "==", email)
-      ); // Truy vấn theo userEmail
+      );
       const snapshot = await getDocs(q);
       const ticketList = snapshot.docs.map((doc) => ({
         id: doc.id,
@@ -57,21 +69,83 @@ const MyTickets = ({ email }) => {
                     Ngày chiếu: {formatDateTime(ticket.date)}
                   </Typography>
                   <Typography>Giờ chiếu: {ticket.time}</Typography>
-                  <Typography>
-                    Ngày đặt vé: {formatDateTime(ticket.createdAt)}
-                  </Typography>
+                  <Button
+                    variant="outlined"
+                    sx={{ marginTop: 1 }}
+                    onClick={() => setSelectedTicket(ticket)}
+                  >
+                    Chi tiết vé
+                  </Button>
                 </CardContent>
               </Card>
             </Grid>
           ))
         )}
       </Grid>
+
+      {/* Dialog hiển thị chi tiết vé */}
+      <Dialog
+        open={!!selectedTicket}
+        onClose={() => setSelectedTicket(null)}
+        fullWidth
+        maxWidth="sm"
+      >
+        {selectedTicket && (
+          <>
+            <DialogTitle>Chi tiết vé</DialogTitle>
+            <DialogContent>
+              <Typography>
+                <strong>Tên phim:</strong> {selectedTicket.movieTitle}
+              </Typography>
+              <Typography>
+                <strong>Rạp:</strong> {selectedTicket.cinemaName}
+              </Typography>
+              <Typography>
+                <strong>Ngày chiếu:</strong>{" "}
+                {formatDateTime(selectedTicket.date)}
+              </Typography>
+              <Typography>
+                <strong>Giờ chiếu:</strong> {selectedTicket.time}
+              </Typography>
+              <Typography>
+                <strong>Ghế:</strong> {selectedTicket.seat}
+              </Typography>
+              <Typography>
+                <strong>Giá vé:</strong> {selectedTicket.price.toLocaleString()}{" "}
+                VNĐ
+              </Typography>
+              <Typography>
+                <strong>Tổng tiền:</strong>{" "}
+                {selectedTicket.totalPrice.toLocaleString()} VNĐ
+              </Typography>
+              <Typography>
+                <strong>Ngày đặt vé:</strong>{" "}
+                {formatDateTime(selectedTicket.createdAt)}
+              </Typography>
+              <Typography>
+                <strong>Người đặt:</strong> {selectedTicket.userName} (
+                {selectedTicket.userEmail})
+              </Typography>
+              <Box sx={{ textAlign: "center", mt: 2 }}>
+                <QRCode
+                  value={selectedTicket.id}
+                  size={150}
+                  style={{ height: "auto", maxWidth: "100%", width: "150px" }}
+                />
+                <Typography variant="caption" sx={{ mt: 1, display: "block" }}>
+                  Mã vé: {selectedTicket.id}
+                </Typography>
+              </Box>
+            </DialogContent>
+          </>
+        )}
+      </Dialog>
     </Box>
   );
 };
 
 MyTickets.propTypes = {
-  email: PropTypes.string, // Kiểm tra 'email' đã được truyền đúng
+  email: PropTypes.string,
 };
 
 export default MyTickets;
